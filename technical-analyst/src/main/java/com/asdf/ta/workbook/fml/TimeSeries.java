@@ -88,7 +88,8 @@ public class TimeSeries implements Formula, WorkSheetListener, HistoricalBarCons
 					double lastPrice = fn.get();
 					nextBar();
 					while (time > nextST) {
-						fn.last(currST, lastPrice);
+						fn.last(0, lastPrice);
+						own.save(fn.getAllTime(), fn.getAll());
 						nextBar();
 					}
 				}
@@ -116,23 +117,14 @@ public class TimeSeries implements Formula, WorkSheetListener, HistoricalBarCons
 			own.clear();
 		}
 		// 1. merge the existing bars with historical bars
-		long[] t = new long[1];
-		double[] p = new double[4];
-		int histCnt = 0;
-		for (; histCnt < time.length && time[histCnt] < currST; histCnt++) {
-			// skip the past overlap bars
-		}
-		// update the last existing bars
-		t[0] = time[histCnt];
-		p[0] = open[histCnt];
-		p[1] = high[histCnt];
-		p[2] = low[histCnt];
-		p[3] = close[histCnt];
-		lastST = time[histCnt];
-		own.save(t, p);
-		// fill in following historical bars
-		for (; histCnt < time.length; histCnt++) {
-			own.nextRow();
+		if (time.length > 0) {
+			long[] t = new long[1];
+			double[] p = new double[4];
+			int histCnt = 0;
+			for (; histCnt < time.length && time[histCnt] < currST; histCnt++) {
+				// skip the past overlap bars
+			}
+			// update the last existing bars
 			t[0] = time[histCnt];
 			p[0] = open[histCnt];
 			p[1] = high[histCnt];
@@ -140,6 +132,17 @@ public class TimeSeries implements Formula, WorkSheetListener, HistoricalBarCons
 			p[3] = close[histCnt];
 			lastST = time[histCnt];
 			own.save(t, p);
+			// fill in following historical bars
+			for (; histCnt < time.length; histCnt++) {
+				own.nextRow();
+				t[0] = time[histCnt];
+				p[0] = open[histCnt];
+				p[1] = high[histCnt];
+				p[2] = low[histCnt];
+				p[3] = close[histCnt];
+				lastST = time[histCnt];
+				own.save(t, p);
+			}
 		}
 		// 2. fill in buffered ticks
 		if (readPos >= src.getStartRowNum()) {

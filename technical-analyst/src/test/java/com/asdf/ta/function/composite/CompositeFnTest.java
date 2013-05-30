@@ -13,7 +13,6 @@ public class CompositeFnTest {
 	static private String DATA_DIR = "indicator_dataset/";
 	static double MARGIN = 0.00005001; // 4 decimal places
 
-	
 	@Test
 	public void testXauDataSet1() {
 		String dataSetName = "xau_set1";
@@ -30,13 +29,13 @@ public class CompositeFnTest {
 		double[][] expResult = loadData(dataSetName + "_macd_12^26^9", dataSize, 3);
 
 		for (int i = 0; i < dataSize; i++) {
+			iut.next();
 			for (int j = 0; j < colNum; j++) {
 				for (DummyFn f : fnList[j]) {
 					f.set(testData[i][j]);
 				}
 				iut.last();
 			}
-			iut.next();
 			Assert.assertArrayEquals("row[" + i + "]", expResult[i], iut.getAll(), MARGIN);
 		}
 	}
@@ -71,7 +70,7 @@ public class CompositeFnTest {
 			BufferedReader br = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader()
 					.getResourceAsStream(DATA_DIR + dataFileName + ".csv")));
 			int lineNo = 0;
-			String str;
+			String str = br.readLine(); // skip the first row = header
 			while ((str = br.readLine()) != null) {
 				String[] dataStr = str.split(",");
 				for (int i = 0; i < dataStr.length; i++) {
@@ -81,6 +80,7 @@ public class CompositeFnTest {
 			}
 			br.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 			Assert.fail("fail to load testing data [" + dataFileName + "] - " + e.getMessage());
 		}
 		return data;

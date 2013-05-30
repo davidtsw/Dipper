@@ -3,6 +3,8 @@ import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
+import com.asdf.ta.function.AbstractFnTest;
+import com.asdf.ta.function.BasicFnTest;
 import com.asdf.ta.function.basic.EmaTest;
 import com.asdf.ta.function.basic.SdTest;
 import com.asdf.ta.function.basic.SmaTest;
@@ -18,6 +20,10 @@ import com.asdf.ta.function.op.binary.OpMinusTest;
 import com.asdf.ta.function.op.binary.OpMultiplyTest;
 import com.asdf.ta.function.op.binary.OpPlusTest;
 import com.asdf.ta.function.op.ternary.OpIfElseTest;
+import com.asdf.ta.timeseries.DailyTimerTest;
+import com.asdf.ta.timeseries.HourlyTimerTest;
+import com.asdf.ta.timeseries.MinutelyTimerTest;
+import com.asdf.ta.timeseries.WeeklyTimerTest;
 import com.asdf.ta.workbook.fml.IndicatorBuilderTest;
 import com.asdf.ta.workbook.fml.IndicatorTest;
 import com.asdf.ta.workbook.fml.TickSeriesTest;
@@ -33,14 +39,9 @@ public class CoverageTest {
 	@Test
 	public void test() {
 		Result rs = JUnitCore.runClasses(new Class[] {
-				/* OpFn */
-				OpPlusTest.class,
-				OpMinusTest.class,
-				OpMultiplyTest.class,
-				OpDivideTest.class,
-				OpGtTest.class,
-				OpLtTest.class,
-				OpIfElseTest.class,
+				/* Function */
+				AbstractFnTest.class,
+				BasicFnTest.class,
 				/* BasicFn */
 				SmaTest.class,
 				EmaTest.class,
@@ -51,6 +52,19 @@ public class CoverageTest {
 				MacdTest.class,
 				SsTest.class,
 				RsiTest.class,
+				/* OpFn */
+				OpPlusTest.class,
+				OpMinusTest.class,
+				OpMultiplyTest.class,
+				OpDivideTest.class,
+				OpGtTest.class,
+				OpLtTest.class,
+				OpIfElseTest.class,
+				/* Timer */
+				HourlyTimerTest.class,
+				MinutelyTimerTest.class,
+				DailyTimerTest.class,
+				WeeklyTimerTest.class,
 				/* Fml */
 				IndicatorTest.class,
 				IndicatorBuilderTest.class,

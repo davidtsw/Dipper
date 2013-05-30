@@ -13,7 +13,7 @@ public class Low extends TemporalFn {
 	}
 	public void last() {
 		if (Double.isNaN(get())
-				|| last.get() > get()) {
+				|| last.get() < get()) {
 			saveTime(last.getTime());
 			saveResult(last.get());
 		}

@@ -12,7 +12,6 @@ public class DailyTimer implements Timer {
 	@Override
 	public long currIntervalStartTime(long currT) {
 		cal.setTimeInMillis(currT);
-		cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -25,6 +24,6 @@ public class DailyTimer implements Timer {
 	}
 	@Override
 	public TimeScale getScale() {
-		return TimeScale.MONTH_1;
+		return TimeScale.DAY_1;
 	}
 }

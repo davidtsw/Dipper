@@ -78,6 +78,10 @@ public class DataSheet extends ObservableSheet implements WorkSheet {
 		return eInd;
 	}
 	@Override
+	public long getSize() {
+		return eInd - sInd + 1;
+	}
+	@Override
 	public Column getColumn() {
 		return dSheet.getColumn();
 	}

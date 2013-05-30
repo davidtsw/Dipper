@@ -23,6 +23,10 @@ public class DummyWS extends ObservableSheet implements WorkSheet {
 		return rowNo;
 	}
 	@Override
+	public long getSize() {
+		return 1;
+	}
+	@Override
 	public Column getColumn() {
 		return null;
 	}

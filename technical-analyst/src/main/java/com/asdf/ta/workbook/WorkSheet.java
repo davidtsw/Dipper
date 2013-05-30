@@ -6,6 +6,8 @@ public interface WorkSheet {
 	//
 	public long getStartRowNum();
 	public long getEndRowNum();
+	public long getSize();
+	//
 	public Column getColumn();
 	public Column getColumn(String colName);
 	public boolean isEmpty();

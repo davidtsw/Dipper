@@ -1,5 +1,6 @@
 package com.asdf.ta.workbook.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 import com.asdf.ta.workbook.TimeScale;
 import com.asdf.ta.workbook.WorkBook;
@@ -10,6 +11,10 @@ public class SimpleWorkBook implements WorkBook {
 	private Map<String, WorkSheetT> tickSheetMap;
 	private Map<String, Map<TimeScale, SheetWrapper>> barSheetMap;
 
+	public SimpleWorkBook() {
+		barSheetMap = new HashMap<String, Map<TimeScale, SheetWrapper>>();
+		tickSheetMap = new HashMap<String, WorkSheetT>();
+	}
 	@Override
 	public WorkSheetT getTick(String symbol) {
 		WorkSheetT tSheet = tickSheetMap.get(symbol);
@@ -31,4 +36,5 @@ public class SimpleWorkBook implements WorkBook {
 		}
 		return null;
 	}
+
 }

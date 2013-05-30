@@ -33,16 +33,16 @@ public abstract class AbstractFn implements Function {
 		return outputs;
 	}
 	@Override
-	final public double get() {
+	public double get() {
 		return results[0];
 	}
 	@Override
-	final public double get(int index) {
+	public double get(int index) {
 		assert index >= 0 && index < results.length : "invalid column: " + index + ", where size = " + results.length;
 		return results[index];
 	}
 	@Override
-	final public double[] getAll() {
+	public double[] getAll() {
 		return results;
 	}
 	/**

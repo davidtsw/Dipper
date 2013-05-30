@@ -28,8 +28,8 @@ public class TimeSeriesFn extends TemporalFn {
 		saveResult();
 	}
 	public void next(long time) {
-		saveTime(time);
 		super.next();
+		saveTime(time);
 	}
 	@Override
 	public void reset() {
@@ -76,6 +76,6 @@ public class TimeSeriesFn extends TemporalFn {
 		Low2 l2 = new Low2(l, 2);
 		Low2 l3 = new Low2(l2, 3);
 		// TODO +volume, sma, etc
-		return new FunctionT[] { o, h, l, c, h2, h3, l2, l3 };
+		return new FunctionT[] { c, o, h, l, h2, h3, l2, l3 };
 	}
 }

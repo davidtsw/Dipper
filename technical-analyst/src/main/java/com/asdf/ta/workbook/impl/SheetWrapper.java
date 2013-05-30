@@ -48,6 +48,10 @@ public class SheetWrapper extends ObservableSheet implements WorkSheetT, WorkShe
 		return ws.getEndRowNum();
 	}
 	@Override
+	public long getSize() {
+		return ws.getSize();
+	}
+	@Override
 	public Column getColumn() {
 		return dSheet.getColumn();
 	}
