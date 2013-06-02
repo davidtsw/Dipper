@@ -31,6 +31,12 @@ public class OpIfElseTest {
 		when(in3.get()).thenReturn(2.345);
 		op.last();
 		Assert.assertTrue(Double.isNaN(op.get()));
+		//
+		when(in1.get()).thenReturn(1d);
+		when(in2.get()).thenReturn(1.234);
+		when(in3.get()).thenReturn(Double.NaN);
+		op.last();
+		Assert.assertTrue(Double.isNaN(op.get()));
 	}
 	@Test
 	public void testInputWithValue() {

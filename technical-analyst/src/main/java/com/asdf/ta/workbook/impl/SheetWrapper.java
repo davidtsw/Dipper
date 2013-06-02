@@ -13,7 +13,7 @@ public class SheetWrapper extends ObservableSheet implements WorkSheetT, WorkShe
 	final private ColumnGroup<ColumnWrapper> dSheet;
 	public SheetWrapper(WorkSheetT ws) {
 		tCol = new ColumnTWrapper();
-		dSheet = new ColumnGroup<ColumnWrapper>(0, FN.getOutputs()) {
+		dSheet = new ColumnGroup<ColumnWrapper>(FN.getOutputs(), 0) {
 			@Override
 			protected ColumnWrapper createColumn(String colName, int capacity) {
 				return new ColumnWrapper();

@@ -1,12 +1,19 @@
 package com.asdf.ta.workbook.fml;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import com.asdf.service.PriceService;
+import com.asdf.service.RealTimeTickConsumer;
 import com.asdf.ta.workbook.ColumnT;
+import com.asdf.ta.workbook.Formula;
+import com.asdf.ta.workbook.TimeScale;
+import com.asdf.ta.workbook.WorkSheetT;
+import com.asdf.ta.workbook.impl.DataSheet;
 import com.asdf.ta.workbook.impl.TimeSheet;
 
 public class TickSeriesTest {
@@ -210,5 +217,23 @@ public class TickSeriesTest {
 		Assert.assertEquals(5.234, own.getColumn(ColumnT.BID).getValue(own.getEndRowNum()), 0.0000000001);
 		Assert.assertEquals(5.236, own.getColumn(ColumnT.ASK).getValue(own.getEndRowNum()), 0.0000000001);
 		Assert.assertEquals(5, own.getColumn(ColumnT.VOLUME).getValue(own.getEndRowNum()), 0.0000000001);
+	}
+	TickSeries iut;
+	@Test
+	public void testGetInstance() {
+		PriceService ps = mock(PriceService.class);
+		doAnswer(new Answer<Object>() {
+			public Object answer(InvocationOnMock invocation) {
+				iut = (TickSeries) invocation.getArguments()[0];
+				return "";
+			}
+		}).when(ps).RegisterRealTimeTick((TickSeries) any());
+		WorkSheetT ws = TickSeries.getInstance("xxx", ps);
+		TickSeries ts = (TickSeries) ((DataSheet) ws).getFml();
+		Assert.assertEquals("xxx", ws.getName());
+		iut.onRealTimeTickUpdated(2, 1234l, 2.345, 3.456, 4);
+		verify(ps).RegisterRealTimeTick(ts);
+		verify(ps).RequestHistoricalTickData(ts, "xxx");
+
 	}
 }

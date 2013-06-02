@@ -11,7 +11,7 @@ public abstract class ColumnGroup<E> {
 	final private E defCol;
 	final private int colNum;
 
-	ColumnGroup(int capacity, List<String> colNames) {
+	ColumnGroup(List<String> colNames, int capacity) {
 		colsMap = new HashMap<String, E>(colNames.size());
 		colsList = new ArrayList<E>(colNames.size());
 		for (String colName : colNames) {
@@ -23,7 +23,6 @@ public abstract class ColumnGroup<E> {
 		defCol = colsMap.get(colNames.get(0));
 		colNum = colNames.size();
 	}
-	abstract protected E createColumn(String colName, int capacity);
 	public int getColumnNum() {
 		return colNum;
 	}
@@ -37,4 +36,5 @@ public abstract class ColumnGroup<E> {
 	public E getColumn(int ind) {
 		return colsList.get(ind);
 	}
+	abstract protected E createColumn(String colName, int capacity);
 }

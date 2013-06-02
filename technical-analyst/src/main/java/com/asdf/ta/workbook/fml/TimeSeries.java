@@ -112,12 +112,13 @@ public class TimeSeries implements Formula, WorkSheetListener, HistoricalBarCons
 	public void onHistoricalBarReady(long[] time, double[] open, double[] high, double[] low, double[] close) {
 
 		long lastST = 0;
-		if (time.length == 0
-				|| time[0] > currST) {
-			own.clear();
-		}
-		// 1. merge the existing bars with historical bars
-		if (time.length > 0) {
+		if (time.length > 0
+				&& readPos >= src.getStartRowNum()) {
+			// 1. merge the existing bars with historical bars
+			if (time[0] > currST) {
+				own.clear();
+				own.nextRow();
+			}
 			long[] t = new long[1];
 			double[] p = new double[4];
 			int histCnt = 0;
@@ -132,6 +133,7 @@ public class TimeSeries implements Formula, WorkSheetListener, HistoricalBarCons
 			p[3] = close[histCnt];
 			lastST = time[histCnt];
 			own.save(t, p);
+			histCnt++;
 			// fill in following historical bars
 			for (; histCnt < time.length; histCnt++) {
 				own.nextRow();
@@ -143,19 +145,22 @@ public class TimeSeries implements Formula, WorkSheetListener, HistoricalBarCons
 				lastST = time[histCnt];
 				own.save(t, p);
 			}
-		}
-		// 2. fill in buffered ticks
-		if (readPos >= src.getStartRowNum()) {
-			// skip the overlap bars
+			fn.next(t[0]);
+			for (int i = 0; i < p.length; i++) {
+				fn.last(t[0], p[i]);
+			}
+
+			// 2. to fill in buffered ticks
 			while (timeCol.getValue(readPos) < lastST) {
+				// skip the overlap bars
 				readPos++;
 			}
 		}
 		if (lastST == 0) { // own is empty
-			currST = timer.currIntervalStartTime(timeCol.getValue(readPos));
-			nextST = timer.nextIntervalStartTime(currST);
-			fn.next(currST);
-			own.nextRow();
+			own.clear();
+			readPos = src.getStartRowNum();
+			nextST = timer.currIntervalStartTime(timeCol.getValue(readPos));
+			nextBar();
 		} else {
 			currST = lastST;
 			nextST = timer.nextIntervalStartTime(currST);

@@ -15,7 +15,6 @@ import com.asdf.ta.function.op.binary.OpPlus;
 import com.asdf.ta.function.op.ternary.OpIfElse;
 
 public class Rsi extends CompositeFn {
-	static final private double DIFF_MARGIN = 0.000000001d;
 	static final private String ABBR = "rsi";
 	//
 	@IndicatorFn(name = ABBR)
@@ -25,8 +24,8 @@ public class Rsi extends CompositeFn {
 		super(ABBR, in);
 		Function c0 = new Const(0), c1 = new Const(1), c100 = new Const(100);
 		Function prev = new Ref(in, 1);
-		Function dSum = new Ws(new OpGt(new OpMinus(prev, in), c0, DIFF_MARGIN), period);
-		Function uSum = new Ws(new OpGt(new OpMinus(in, prev), c0, DIFF_MARGIN), period);
+		Function dSum = new Ws(new OpGt(new OpMinus(prev, in), c0), period);
+		Function uSum = new Ws(new OpGt(new OpMinus(in, prev), c0), period);
 		Function rsi = new OpMinus(c100, new OpDivide(c100, new OpPlus(c1, new OpDivide(uSum, dSum))));
 		//
 		withOutputs(new OpIfElse(dSum, rsi, c100));

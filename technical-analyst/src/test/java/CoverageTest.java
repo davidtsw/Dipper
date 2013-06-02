@@ -20,14 +20,20 @@ import com.asdf.ta.function.op.binary.OpMinusTest;
 import com.asdf.ta.function.op.binary.OpMultiplyTest;
 import com.asdf.ta.function.op.binary.OpPlusTest;
 import com.asdf.ta.function.op.ternary.OpIfElseTest;
+import com.asdf.ta.function.op.unary.OpSqTest;
+import com.asdf.ta.function.op.unary.OpSqrtTest;
 import com.asdf.ta.timeseries.DailyTimerTest;
 import com.asdf.ta.timeseries.HourlyTimerTest;
 import com.asdf.ta.timeseries.MinutelyTimerTest;
+import com.asdf.ta.timeseries.MonthlyTimerTest;
 import com.asdf.ta.timeseries.WeeklyTimerTest;
 import com.asdf.ta.workbook.fml.IndicatorBuilderTest;
 import com.asdf.ta.workbook.fml.IndicatorTest;
 import com.asdf.ta.workbook.fml.TickSeriesTest;
 import com.asdf.ta.workbook.fml.TimeSeriesTest;
+import com.asdf.ta.workbook.impl.DataSheetTest;
+import com.asdf.ta.workbook.impl.ObservableSheetTest;
+import com.asdf.ta.workbook.impl.TimeSheetTest;
 
 /*
  * checking test coverage only
@@ -53,6 +59,8 @@ public class CoverageTest {
 				SsTest.class,
 				RsiTest.class,
 				/* OpFn */
+				OpSqTest.class,
+				OpSqrtTest.class,
 				OpPlusTest.class,
 				OpMinusTest.class,
 				OpMultiplyTest.class,
@@ -65,11 +73,16 @@ public class CoverageTest {
 				MinutelyTimerTest.class,
 				DailyTimerTest.class,
 				WeeklyTimerTest.class,
+				MonthlyTimerTest.class,
 				/* Fml */
 				IndicatorTest.class,
 				IndicatorBuilderTest.class,
 				TickSeriesTest.class,
 				TimeSeriesTest.class,
+				/* WS */
+				ObservableSheetTest.class,
+				DataSheetTest.class,
+				TimeSheetTest.class,
 		});
 		// check testing result
 		for (Failure f : rs.getFailures()) {

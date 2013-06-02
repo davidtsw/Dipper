@@ -7,11 +7,12 @@ import org.junit.Test;
 import com.asdf.ta.function.Function;
 
 public class OpGtTest {
+	static public double DELTA = 0000000001d;
 	@Test
 	public void testInputNotValue() {
 		Function in1 = mock(Function.class);
 		Function in2 = mock(Function.class);
-		OpGt op = new OpGt(in1, in2, 0.0000000001);
+		OpGt op = new OpGt(in1, in2);
 		// both inputs have no value
 		when(in1.get()).thenReturn(Double.NaN);
 		when(in2.get()).thenReturn(Double.NaN);
@@ -19,7 +20,12 @@ public class OpGtTest {
 		Assert.assertTrue(Double.isNaN(op.get()));
 		// either inputs have no value
 		when(in1.get()).thenReturn(Double.NaN);
-		when(in2.get()).thenReturn(1.234);
+		when(in2.get()).thenReturn(2.345);
+		op.last();
+		Assert.assertTrue(Double.isNaN(op.get()));
+		//
+		when(in1.get()).thenReturn(1.234);
+		when(in2.get()).thenReturn(Double.NaN);
 		op.last();
 		Assert.assertTrue(Double.isNaN(op.get()));
 	}
@@ -27,11 +33,16 @@ public class OpGtTest {
 	public void testInputWithValue() {
 		Function in1 = mock(Function.class);
 		Function in2 = mock(Function.class);
-		OpGt op = new OpGt(in1, in2, 0.0000000001);
+		OpGt op = new OpGt(in1, in2);
 		//
 		when(in1.get()).thenReturn(1.234);
 		when(in2.get()).thenReturn(2.345);
 		op.last();
-		Assert.assertEquals(2.345, op.get(), 0.0000000001d);
+		Assert.assertEquals(2.345, op.get(), DELTA);
+		//
+		when(in1.get()).thenReturn(2.345);
+		when(in2.get()).thenReturn(1.234);
+		op.last();
+		Assert.assertEquals(2.345, op.get(), DELTA);
 	}
 }

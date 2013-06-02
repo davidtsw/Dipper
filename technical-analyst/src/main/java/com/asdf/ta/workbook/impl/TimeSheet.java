@@ -12,18 +12,23 @@ public class TimeSheet extends DataSheet implements WorkSheetT {
 	public TimeSheet(String name, String desc, List<String> dColNames, List<String> tColNames) {
 		super(name, desc, dColNames);
 		int capacity = _WorkSheetCapacity;
-		tSheet = new ColumnGroup<TimeColumn>(capacity, tColNames) {
+		tSheet = new ColumnGroup<TimeColumn>(tColNames, capacity) {
 			@Override
 			protected TimeColumn createColumn(String colName, int capacity) {
 				return new TimeColumn(colName, capacity);
 			}
 		};
 	}
+	@Override
 	public ColumnT getTemporalColumn() {
 		return tSheet.getColumn();
 	}
+	@Override
 	public ColumnT getTemporalColumn(String colName) {
 		return tSheet.getColumn(colName);
+	}
+	public long getTemporalLast(String colName) {
+		return tSheet.getColumn(colName).getValue(eInd);
 	}
 	public void save(long[] ts, double[] val) {
 		assert ts.length <= tSheet.getColumnNum();

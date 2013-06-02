@@ -9,6 +9,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.Arrays;
+import java.util.Date;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -95,8 +96,10 @@ public class TimeSeriesTest {
 		}
 	}
 	private void assertLastRow(WorkSheetT ts, String col, long time, double val, int offset) {
-		Assert.assertEquals("col: " + col, time, ts.getTemporalColumn(col).getValue(ts.getEndRowNum() + offset));
-		Assert.assertEquals("col: " + col, val, ts.getColumn(col).getValue(ts.getEndRowNum() + offset), 0.0000000001);
+		Assert.assertEquals("Time[" + col + "]", time,
+				ts.getTemporalColumn(col).getValue(ts.getEndRowNum() + offset));
+		Assert.assertEquals("Value[" + col + "]", val,
+				ts.getColumn(col).getValue(ts.getEndRowNum() + offset), 0.0000000001);
 	}
 	@Test
 	public void testInterDay() {
@@ -328,6 +331,167 @@ public class TimeSeriesTest {
 				new String[] { "xxx", ColumnT.CLOSE },
 				new long[] { dayT_15, tickT_5 },
 				new double[] { 5.234, 5.234 });
+
+	}
+	@Test
+	public void testDiscontHistoricalTicks() {
+		TimeSheet tick = new TimeSheet("tick", "dummy",
+				Arrays.asList(ColumnT.BID, ColumnT.ASK, ColumnT.VOLUME), Arrays.asList(ColumnT.TIME));
+		Timer m1 = TimeScale.MINUTE_1.getTimer();
+		PriceService ps = mock(PriceService.class);
+		WorkSheetT ts = TimeSeries.getInstance("xxx", ps, m1, tick);
+		doAnswer(new Answer<Object>() {
+			public Object answer(InvocationOnMock invocation) {
+				iut = (TimeSeries) invocation.getArguments()[0];
+				return "";
+			}
+		}).when(ps).RequestHistoricalBarData((TimeSeries) any(), (String) any(), (TimeScale) any());
+		// own xxx hist =/= buff
+		long minT_1 = MID_NIGHT + ONE_MINUTE;
+		long tickT_1 = minT_1 + 11;
+		long tickT_2 = minT_1 + 22;
+		saveTick(tick, tickT_1, 1.234, 1.236, 1);
+		saveTick(tick, tickT_2, 2.234, 2.236, 2);
+		tick.discard(tick.getEndRowNum());
+		iut.onHistoricalBarReady(
+				new long[] { minT_1 },
+				new double[] { 1.234 },
+				new double[] { 1.234 },
+				new double[] { 1.234 },
+				new double[] { 1.234 });
+		//
+		Assert.assertEquals(1, ts.getSize());
+		assertLastRow(ts,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				hvTime(minT_1, tickT_2, tickT_2),
+				wValue(2.234, 2.234, 2.234));
+
+		// own =/= hist === buff
+		long minT_2 = minT_1 + ONE_MINUTE;
+		long tickT_3 = minT_2 + 33;
+		long tickT_4 = minT_2 + 44;
+		long tickT_5 = minT_2 + 55;
+		tick.clear();
+		saveTick(tick, tickT_4, 4.234, 4.236, 4);
+		saveTick(tick, tickT_5, 5.234, 5.236, 5);
+		iut.onHistoricalBarReady(
+				new long[] { minT_2 },
+				new double[] { 3.234 },
+				new double[] { 3.234 },
+				new double[] { 3.234 },
+				new double[] { 3.234 });
+		//
+		printCol(ts, "xxx");
+		Assert.assertEquals(1, ts.getSize());
+		assertLastRow(ts,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				// OPEN will lose the time because hist has value only
+				hvTime(minT_2, minT_2, tickT_5),
+				wValue(5.234, 3.234, 5.234));
+	}
+	private void printCol(WorkSheetT ts, String colName) {
+		for (long i = ts.getStartRowNum(); i <= ts.getEndRowNum(); i++) {
+			System.out.println(ts.getColumn(colName).getValue(i) +
+					"@" + new Date(ts.getTemporalColumn(colName).getValue(i)));
+		}
+
+	}
+	private String[] onCol(String... cols) {
+		return cols;
+	}
+	private long[] hvTime(long... times) {
+		return times;
+	}
+	private double[] wValue(double... vals) {
+		return vals;
+	}
+	static TimeSeries iut;
+	@Test
+	public void testContHistoricalTicks() {
+		TimeSheet tick = new TimeSheet("tick", "dummy",
+				Arrays.asList(ColumnT.BID, ColumnT.ASK, ColumnT.VOLUME), Arrays.asList(ColumnT.TIME));
+		Timer m1 = TimeScale.MINUTE_1.getTimer();
+		PriceService ps = mock(PriceService.class);
+		WorkSheetT ts = TimeSeries.getInstance("xxx", ps, m1, tick);
+		doAnswer(new Answer<Object>() {
+			public Object answer(InvocationOnMock invocation) {
+				iut = (TimeSeries) invocation.getArguments()[0];
+				return "";
+			}
+		}).when(ps).RequestHistoricalBarData((TimeSeries) any(), (String) any(), (TimeScale) any());
+		// own xxx hist === buff
+		long minT_1 = MID_NIGHT + ONE_MINUTE;
+		long tickT_1 = minT_1 + 11;
+		long tickT_2 = minT_1 + 22;
+		saveTick(tick, tickT_1, 1.234, 1.236, 1);
+		saveTick(tick, tickT_2, 2.234, 2.236, 2);
+		iut.onHistoricalBarReady(
+				new long[] { minT_1 },
+				new double[] { 0.234 },
+				new double[] { 0.234 },
+				new double[] { 0.234 },
+				new double[] { 0.234 });
+		//
+		Assert.assertEquals(1, ts.getSize());
+		assertLastRow(ts,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				hvTime(minT_1, minT_1, tickT_2),
+				wValue(2.234, 0.234, 2.234));
+
+		// own === hist === buff
+		long tickT_3 = minT_1 + 33;
+		long tickT_4 = minT_1 + 44;
+		long minT_2 = minT_1 + ONE_MINUTE;
+		long tickT_5 = minT_2 + 55;
+		tick.clear();
+		saveTick(tick, tickT_4, 4.234, 4.236, 4);
+		saveTick(tick, tickT_5, 5.234, 5.236, 5);
+		iut.onHistoricalBarReady(
+				new long[] { minT_1 },
+				new double[] { 3.234 },
+				new double[] { 3.234 },
+				new double[] { 3.234 },
+				new double[] { 3.234 });
+		//
+		printCol(ts, "xxx");
+		Assert.assertEquals(2, ts.getSize());
+		assertLastRow(ts, -1,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				hvTime(minT_1, minT_1, tickT_4),
+				wValue(4.234, 3.234, 4.234));
+		assertLastRow(ts,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				hvTime(minT_2, tickT_5, tickT_5),
+				wValue(5.234, 5.234, 5.234));
+		// own === hist === buff
+		long tickT_6 = minT_2 + 66;
+		long tickT_7 = minT_2 + 77;
+		long minT_3 = minT_2 + ONE_MINUTE;
+		long tickT_8 = minT_3 + 88;
+		tick.clear();
+		saveTick(tick, tickT_7, 7.234, 7.236, 7);
+		saveTick(tick, tickT_8, 8.234, 8.236, 8);
+		iut.onHistoricalBarReady(
+				new long[] { minT_1, minT_2, minT_3 },
+				new double[] { 0.234, 3.234, 6.234 },
+				new double[] { 0.234, 3.234, 6.234 },
+				new double[] { 0.234, 3.234, 6.234 },
+				new double[] { 0.234, 3.234, 6.234 });
+		//
+		printCol(ts, "xxx");
+		Assert.assertEquals(3, ts.getSize());
+		assertLastRow(ts, -2,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				hvTime(minT_1, minT_1, tickT_4),
+				wValue(4.234, 3.234, 4.234));
+		assertLastRow(ts, -1,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				hvTime(minT_2, tickT_5, tickT_5),
+				wValue(3.234, 3.234, 3.234));
+		assertLastRow(ts,
+				onCol("xxx", ColumnT.OPEN, ColumnT.CLOSE),
+				hvTime(minT_3, minT_3, tickT_8),
+				wValue(8.234, 6.234, 8.234));
 
 	}
 	// TODO test cases with onHistBar mix with dayEndStart

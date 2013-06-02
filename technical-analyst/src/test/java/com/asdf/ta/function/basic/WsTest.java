@@ -6,7 +6,6 @@ import com.asdf.ta.function.DummyFn;
 import com.asdf.ta.function.FunctionTest;
 import com.asdf.ta.workbook.fml.IndicatorAssert;
 
-@SuppressWarnings("unused")
 public class WsTest implements FunctionTest {
 	@Test
 	public void testExample_1() {

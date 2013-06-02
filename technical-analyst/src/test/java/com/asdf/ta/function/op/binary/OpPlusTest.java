@@ -19,7 +19,12 @@ public class OpPlusTest {
 		Assert.assertTrue(Double.isNaN(op.get()));
 		// either inputs have no value
 		when(in1.get()).thenReturn(Double.NaN);
-		when(in2.get()).thenReturn(1.234);
+		when(in2.get()).thenReturn(2.345);
+		op.last();
+		Assert.assertTrue(Double.isNaN(op.get()));
+		//
+		when(in1.get()).thenReturn(1.234);
+		when(in2.get()).thenReturn(Double.NaN);
 		op.last();
 		Assert.assertTrue(Double.isNaN(op.get()));
 	}

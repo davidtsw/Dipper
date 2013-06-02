@@ -8,7 +8,7 @@ import com.asdf.ta.workbook.Formula;
 import com.asdf.ta.workbook.WorkSheet;
 
 public class DataSheet extends ObservableSheet implements WorkSheet {
-	static protected int _WorkSheetCapacity = 1000;
+	static int _WorkSheetCapacity = 1000;
 	static public void setDefaultCapacity(int capacity) {
 		_WorkSheetCapacity = capacity;
 	}
@@ -23,7 +23,7 @@ public class DataSheet extends ObservableSheet implements WorkSheet {
 		this.name = name;
 		this.desc = desc;
 		this.capacity = _WorkSheetCapacity;
-		dSheet = new ColumnGroup<DataColumn>(capacity, colNames) {
+		dSheet = new ColumnGroup<DataColumn>(colNames, capacity) {
 			@Override
 			protected DataColumn createColumn(String colName, int capacity) {
 				return new DataColumn(colName, capacity);
@@ -34,6 +34,9 @@ public class DataSheet extends ObservableSheet implements WorkSheet {
 	}
 	public void setFml(Formula fml) {
 		this.fml = fml;
+	}
+	public Formula getFml() {
+		return fml;
 	}
 	public void save(double[] val) {
 		assert val.length <= dSheet.getColumnNum();
@@ -51,7 +54,6 @@ public class DataSheet extends ObservableSheet implements WorkSheet {
 			dSheet.getColumn(i).clear(eInd);
 		}
 	}
-
 	public void clear() {
 		// move the range forwards
 		clear(eInd + 2);
@@ -59,6 +61,13 @@ public class DataSheet extends ObservableSheet implements WorkSheet {
 	public void clear(long newStartIndex) {
 		sInd = newStartIndex;
 		eInd = sInd - 1;
+	}
+	public void discard(long newStartIndex) {
+		sInd = newStartIndex;
+		if (eInd < sInd) {
+			// discard all
+			eInd = sInd - 1;
+		}
 	}
 
 	@Override
@@ -88,6 +97,9 @@ public class DataSheet extends ObservableSheet implements WorkSheet {
 	@Override
 	public Column getColumn(String colName) {
 		return dSheet.getColumn(colName);
+	}
+	public double getLast(String colName) {
+		return dSheet.getColumn(colName).getValue(eInd);
 	}
 	@Override
 	public boolean isEmpty() {
